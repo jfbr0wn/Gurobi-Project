@@ -1,0 +1,6 @@
+{
+	"num_models": "1",
+	"runs_per_model": "1",
+	"find_max_clique": "1",
+	"find_inverse_clique": "0",
+}
