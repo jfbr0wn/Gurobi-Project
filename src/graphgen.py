@@ -8,15 +8,15 @@
 #
 import random # This is a module that contains programs involving random numbers.
 
-def main():
-    nodenum = raw_input("How many nodes in the graph?  ")
-    prob = raw_input("What edge probability? Input a decimal number between 0.01 and 0.99, inclusive. ")
+def Graphgen(nodenum, prob, graph):
+    #nodenum = raw_input("How many nodes in the graph?  ")
+    #prob = raw_input("What edge probability? Input a decimal number between 0.01 and 0.99, inclusive. ")
     nodenum = int (nodenum)
     fprob = float (prob)
 
-    graph = raw_input("What is the name of the file you want to use for the output?  ")
+    #graph = raw_input("What is the name of the file you want to use for the output?  ")
     OUTGRAPH = open(graph, 'w')
-    print "You input: %d, %f, %s" % (nodenum,  fprob, graph)
+    #print "You input: %d, %f, %s" % (nodenum,  fprob, graph)
 
     rcut = fprob * 100
     nodenump1 = int(nodenum) + 1
@@ -40,5 +40,5 @@ def main():
         for j in range(1,nodenump1):
             OUTGRAPH.write(matrix[i][j])
         OUTGRAPH.write("\n")
-    print "The %d-by-%d adjacency matrix for the graph generated is in file %s" % (nodenum, nodenum, graph)
-main()
+    #print "The %d-by-%d adjacency matrix for the graph generated is in file %s" % (nodenum, nodenum, graph)
+#main()
