@@ -1,18 +1,18 @@
 {
     "GraphData": {
-        "max_nodes": "200", 
+        "min_probability": "0.5", 
+        "max_nodes": "150", 
         "min_nodes": "100", 
-        "graph_file": "graphs/graph", 
         "max_probability": "0.9", 
-        "min_probability": "0.5"
+        "graph_file": "graphs/graph"
     }, 
     "Parameters": {
         "find_max_clique": "1", 
-        "run": "8", 
+        "run": "9", 
         "runs_per_model": "10", 
         "nclique_file": "lp/nclique", 
         "num_trials": "1", 
-        "find_inverse_clique": "0", 
-        "mclique_file": "lp/mclique"
+        "mclique_file": "lp/mclique", 
+        "find_inverse_clique": "0"
     }
 }
