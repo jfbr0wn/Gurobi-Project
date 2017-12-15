@@ -9,23 +9,23 @@ from graphgen import Graphgen
 
 from CLgraphfile import MClique 
 
-from optimizer import *
+from experimentor import *
 
 from reporter import *
 
 
  # Get the experiment parameters stored a json file
-expParams = "expParamaters.json"
+expParams = "Parameters.json"
 
 
 # Controller tasks:
-# Access experiment parameters
-# Create an instance of report
-# Create an instance of experiment
-# Create a set of graphfiles to test on
-# Create lp files for gurobi to solve on
-# Run all experiments
-# Store to report
+# 1) Access experiment parameters
+# 2)Create an instance of report
+# 3) Create an instance of experiment
+# 4) Create a set of graphfiles to test on
+# 5) Create lp files for gurobi to solve on
+# 6) Run all experiments
+# 7) Store to report
 def Controller():
 	# Read in our experimental parameters
 	json_data = json.load(open(expParams))
@@ -48,9 +48,9 @@ def Controller():
 	gf = graph_data["graph_file"]
 
 	# Create a report
-	rpt = Reporter(run)
+	rpt = Reporter(run, min_nodes, max_nodes, min_prob, max_prob)
 	
-
+	# Init variable lists
 	graphfile = []
 	mclique_file = []
 	nclique_file = []
@@ -73,64 +73,29 @@ def Controller():
 	# Run Trials for Each example of Max Clique
 	if(find_max_clique):
 
-		# Run Base Model
-		for j in range(runs_per_model):
-			opt = Optimizer(mclique_file[j])
-			base_time = opt.base_solve()
-			rpt.log_time("base", j+1, base_time)
-		rpt.calculate("base")
+		exp = Experimentor(rpt, mclique_file)
 
-		# Run Custom Callback
-		for j in range(runs_per_model):
-			opt = Optimizer(mclique_file[j])
-			ccb_time = opt.ccb_solve()
-			rpt.log_time("ccb", j+1, ccb_time)
-		rpt.calculate("ccb")
+		exp.experiment("base") # Run Base Gurobi, No optimizers
 
-		# Run MIP Focus = 1
-		for j in range(runs_per_model):
-			opt = Optimizer(mclique_file[j])
-			mip_time = opt.mip_solve(1)
-			rpt.log_time("mip1", j+1, mip_time)
-		rpt.calculate("mip1")
+		exp.experiment("ccb") # Run Gurobi using a custom callback function
 
-		# Run MIP Focus = 2
-		for j in range(runs_per_model):
-			opt = Optimizer(mclique_file[j])
-			mip_time = opt.mip_solve(2)
-			rpt.log_time("mip2", j+1, mip_time)
-		rpt.calculate("mip2")
+		exp.experiment("mip1") # Run Gurobi with MIPFocus set to 1
 
-		# Run MIP Focus = 3
-		for j in range(runs_per_model):
-			opt = Optimizer(mclique_file[j])
-			mip_time = opt.mip_solve(3)
-			rpt.log_time("mip3", j+1, mip_time)
-		rpt.calculate("mip3")
+		exp.experiment("mip2") # Run Gurobi with MIPFocus set to 2
 
-		# Run Gurobi Build in Tuner
-		for j in range(runs_per_model):
-			opt = Optimizer(mclique_file[j])
-			tune_time = opt.tune_solve(False)
-			rpt.log_time("tuner", j+1, tune_time)
-		rpt.calculate("tuner")
+		exp.experiment("mip3") # Run Gurobi with MIPFocus set to 3
 
-		# Run Gap Solving Algorithm
-		for j in range(runs_per_model):
-			opt = Optimizer(mclique_file[j])
-			gap_time = opt.gap_solve()
-			rpt.log_time("gap", j+1, mip_time)
-		rpt.calculate("gap")
+		exp.experiment("tuner") # Run Gurobi builtin parameter tuning
 
-		# Run Branch solving algorithm
-		for j in range(runs_per_model):
-			opt = Optimizer(mclique_file[j])
-			branch_time = opt.branch_solve()
-			rpt.log_time("branch", j+1, mip_time)
-		rpt.calculate("branch")
+		exp.experiment("gap") # Run Gurobi with a gap reducing optimizer
+
+		exp.experiment("branch") # Run Gurobi with a branch reducing Optimizer
+
+	# Possible Extension: Add support for other Gurobi Algorithms
 
  	rpt.close()
 
+ 	# Increment run indentifier to avoid overwriting preexisting runs
 	json_data["Parameters"]["run"] = str(run + 1)
 	json.dump(json_data, open(expParams, "w"), indent = 4)
 
